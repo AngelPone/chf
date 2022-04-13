@@ -1,7 +1,6 @@
 # utility functions
 library(forecast)
-source('../chf.r')
-
+set.seed(42)
 hts <- function(basis, sMat) {
   t(sMat %*% t(basis))
 }
@@ -19,37 +18,6 @@ cal_basef <- function(series, method = 'arima'){
     c(fitted(model), forecast(model, h=24)$mean)
   })
 }
-reconcile <- function(series, basef, immu_set){
-  series = hts(series, sMat)
-  insample_f = basef[1:300,]
-  insample_error = insample_f - series
-  cov_mat = cov(insample_error)
-  outsample_f = basef[301:324,]
-  
-  # ols 
-  ols = forecast.reconcile(outsample_f, 
-                     sMat, 
-                     diag(rep(1, 7)),
-                     immu_set = immu_set)
-  
-  # wlss
-  weight_mat = diag(rowSums(sMat))
-  wlss = forecast.reconcile(outsample_f, 
-                            sMat, 
-                            weight_mat,
-                            immu_set = immu_set)
-  # wlsv
-  weight_mat = diag(diag(cov_mat))
-  wlsv = forecast.reconcile(outsample_f, 
-                           sMat, 
-                           weight_mat,
-                           immu_set = immu_set)
-  # shrinkage
-  rbind(data.frame(ols, method='ols', t=301:324),
-        data.frame(wlss, method='wlss', t=301:324),
-        data.frame(wlsv, method='wlsv', t=301:324))
-}
-
 
 # settings
 sMat = rbind(matrix(c(1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1), 3, 4),

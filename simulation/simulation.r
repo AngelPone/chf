@@ -78,7 +78,6 @@ simulate_ts2 <- function(n, sigma2_varrho, sigma2_varsigma, sigma2_omega, eta_ma
 
 
 # set parameters
-set.seed(42)
 n = 324
 repeat_n = 100
 freq = 12

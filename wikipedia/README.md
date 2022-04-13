@@ -16,5 +16,6 @@ Install `pyhts`
 
 ```
 git clone https://github.com/AngelPone/paper-chf
+cd pyhts
 pip install -e .
 ```

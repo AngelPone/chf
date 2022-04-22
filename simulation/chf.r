@@ -34,15 +34,17 @@ forecast.reconcile <- function(base_forecasts,
   candidate_basis <- setdiff((n-m+1):n, immu_set)
   mutable_basis <- c()
   immutable_basis <- sort(immu_set)
+  determined <- c()
   i <- max(which(immutable_basis < n-m+1))
   if (i > 0){
     while (length(mutable_basis) != m-k) {
       corresponding_leaves <- which(sMat[immutable_basis[i], ] == 1) + n - m
-      free_leaves <- setdiff(corresponding_leaves, immutable_basis)
+      free_leaves <- setdiff(corresponding_leaves, c(immutable_basis, mutable_basis, determined))
       if (length(free_leaves) == 0) stop(simpleError('the immu_set can not be used to describe the hierarchy'))
       if (length(free_leaves) == 1) {
         candidate_basis <- candidate_basis[candidate_basis != free_leaves[1]]
       } else{
+        determined <- c(determined, free_leaves[1])
         mutable_basis <- c(mutable_basis, free_leaves[2:length(free_leaves)])
         candidate_basis <- candidate_basis[!(candidate_basis %in% free_leaves)]
       }

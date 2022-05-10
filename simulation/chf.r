@@ -31,12 +31,14 @@ forecast.reconcile <- function(base_forecasts,
     stop(simpleError(sprintf('length of basis set can not be bigger than %d', m)))
   }
   ## select mutable series
-  candidate_basis <- setdiff((n-m+1):n, immu_set)
-  mutable_basis <- c()
   immutable_basis <- sort(immu_set)
-  determined <- c()
-  i <- max(which(immutable_basis < n-m+1))
-  if (i > 0){
+  candidate_basis <- setdiff((n-m+1):n, immu_set)
+  if (all(immutable_basis >= n-m+1 )){
+    mutable_basis <- candidate_basis
+  } else {
+    mutable_basis <- c()  
+    determined <- c()
+    i <- max(which(immutable_basis < n-m+1))
     while (length(mutable_basis) != m-k) {
       corresponding_leaves <- which(sMat[immutable_basis[i], ] != 0) + n - m
       free_leaves <- setdiff(corresponding_leaves, c(immutable_basis, mutable_basis, determined))
@@ -50,10 +52,7 @@ forecast.reconcile <- function(base_forecasts,
       }
       i <- i - 1
     }
-  } else {
-    mutable_basis <- setdiff((n-m+1):n, immu_set)
   }
-  
   new_basis <- c(sort(mutable_basis), immutable_basis)
   sMat <- transform.sMat(sMat, new_basis)
   S1 <- sMat[1:(n-k),,drop=FALSE][,1:(m-k),drop=FALSE]

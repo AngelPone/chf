@@ -16,7 +16,8 @@ transform.sMat <- function(sMat, basis_set){
 forecast.reconcile <- function(base_forecasts, 
                                sMat,
                                weighting_matrix,
-                               immu_set=NULL){
+                               immu_set=NULL,
+                               nonnegative=FALSE){
   m <- dim(sMat)[2]
   n <- dim(sMat)[1]
   k <- length(immu_set)
@@ -63,7 +64,23 @@ forecast.reconcile <- function(base_forecasts,
   mutable_base <- cbind(base_forecasts[,determined,drop=FALSE] - t(S2 %*% t(base_forecasts[,immutable_basis,drop=FALSE])),
                         base_forecasts[,sort(mutable_basis),drop=FALSE])
   reconciled_mutable <- solve(t(S1) %*% mutable_weight %*% S1) %*% t(S1) %*% mutable_weight %*% t(mutable_base)
+  reconciled_y <- t(sMat %*% rbind(reconciled_mutable, t(base_forecasts[,immutable_basis,drop=FALSE])))
+  if (nonnegative){
+    for (i in 1:dim(mutable_base)[1]){
+      dvec <- as.vector(t(mutable_base[i,]) %*% mutable_weight %*% S1)
+      Dmat <- t(S1) %*% mutable_weight %*% S1
+      Amat <- diag(rep(1, dim(S1)[2]))
+      bvec <- rep(0, dim(S1)[2])
+      sol <- try(quadprog::solve.QP(Dmat, dvec, Amat, bvec)$solution)
+      if (is(sol, "try-error")){
+        warning(paste0("unsolvable at row ", rownames(basef)[i], " use unconstrained solution!"))
+      }else{
+        reconciled_y[i,] <- as.vector(sMat %*% c(sol, base_forecasts[i,immutable_basis,drop=FALSE]))
+      }
+    }
+  }
   new_index <- c(determined, new_basis)
-  reconciled_y <- sMat %*% rbind(reconciled_mutable, t(base_forecasts[,immutable_basis,drop=FALSE]))
-  t(reconciled_y[order(new_index),])
+  reconciled_y[,order(new_index)]
 }
+
+

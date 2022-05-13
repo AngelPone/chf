@@ -65,10 +65,11 @@ forecast.reconcile <- function(base_forecasts,
                         base_forecasts[,sort(mutable_basis),drop=FALSE])
   reconciled_mutable <- solve(t(S1) %*% mutable_weight %*% S1) %*% t(S1) %*% mutable_weight %*% t(mutable_base)
   reconciled_y <- t(sMat %*% rbind(reconciled_mutable, t(base_forecasts[,immutable_basis,drop=FALSE])))
+  mutable_weight <- mutable_weight / max(diag(mutable_weight))
   if (nonnegative){
     for (i in 1:dim(mutable_base)[1]){
-      dvec <- as.vector(t(mutable_base[i,]) %*% mutable_weight %*% S1)
       Dmat <- t(S1) %*% mutable_weight %*% S1
+      dvec <- as.vector(t(mutable_base[i,]) %*% mutable_weight %*% S1)
       Amat <- diag(rep(1, dim(S1)[2]))
       bvec <- rep(0, dim(S1)[2])
       sol <- try(quadprog::solve.QP(Dmat, dvec, Amat, bvec)$solution)

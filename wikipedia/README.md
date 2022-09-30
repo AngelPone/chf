@@ -1,21 +1,4 @@
 # README
 
+Code for reproducing the results of Wikipedia experiments in Section 6.
 
-
-
-Please run the following code to produce results of wikipedia application in section 6.
-
-```
-bash evaluate.sh
-```
-
-## Requirements
-
-
-Install `pyhts`
-
-```
-git clone https://github.com/AngelPone/paper-chf
-cd pyhts
-pip install -e .
-```

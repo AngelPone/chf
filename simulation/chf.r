@@ -11,8 +11,6 @@ transform.sMat <- function(sMat, basis_set){
   rbind(S2 %*% transitionMat, diag(rep(1, m)))
 }
 
-
-# 
 forecast.reconcile <- function(base_forecasts, 
                                sMat,
                                weighting_matrix,
@@ -52,6 +50,9 @@ forecast.reconcile <- function(base_forecasts,
         candidate_basis <- candidate_basis[!(candidate_basis %in% free_leaves)]
       }
       i <- i - 1
+      if (i == 0) {
+        mutable_basis <- c(mutable_basis, candidate_basis)
+      }
     }
   }
   new_basis <- c(sort(mutable_basis), immutable_basis)

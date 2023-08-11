@@ -8,3 +8,5 @@ Code for paper 《Optimal reconciliation with immutable forecasts》
   ```r
   Rsciprt wikipedia/wikipedia.R
   ```
+
+ Please feel free to submit an issue if any upexpected errors are reported.
